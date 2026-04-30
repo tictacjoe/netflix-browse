@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Netflix Browse</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:       #0a0a0a;
+    --surface:  #141414;
+    --card:     #1c1c1c;
+    --border:   #2a2a2a;
+    --red:      #e50914;
+    --red-dim:  #8b0000;
+    --gold:     #f5c518;
+    --tomato:   #fa320a;
+    --text:     #e8e8e8;
+    --muted:    #777;
+    --selected: #e50914;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+  }
+
+  header {
+    background: linear-gradient(180deg, #000 0%, transparent 100%);
+    padding: 2rem 3rem 1rem;
+    display: flex;
+    align-items: baseline;
+    gap: 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  header h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3rem;
+    color: var(--red);
+    letter-spacing: 2px;
+    line-height: 1;
+  }
+
+  header p {
+    color: var(--muted);
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .controls {
+    padding: 2rem 3rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    max-width: 1100px;
+  }
+
+  .section-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--muted);
+    margin-bottom: 0.6rem;
+  }
+
+  /* Genre grid */
+  .genre-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .genre-btn {
+    padding: 0.4rem 1rem;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--muted);
+    border-radius: 2px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.8rem;
+    letter-spacing: 0.5px;
+    transition: all 0.15s;
+    user-select: none;
+  }
+
+  .genre-btn:hover {
+    border-color: var(--red-dim);
+    color: var(--text);
+  }
+
+  .genre-btn.selected {
+    background: var(--red);
+    border-color: var(--red);
+    color: #fff;
+    font-weight: 500;
+  }
+
+  /* AND/OR toggle */
+  .mode-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .toggle-wrap {
+    display: flex;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .toggle-btn {
+    padding: 0.35rem 1.2rem;
+    background: var(--card);
+    color: var(--muted);
+    border: none;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    transition: all 0.15s;
+  }
+
+  .toggle-btn.active {
+    background: var(--red);
+    color: #fff;
+  }
+
+  .mode-hint {
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+
+  /* Sort row */
+  .sort-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .sort-btn {
+    padding: 0.35rem 1rem;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--muted);
+    border-radius: 2px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .sort-btn .sort-rank {
+    background: var(--red);
+    color: #fff;
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    font-size: 0.65rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 500;
+  }
+
+  .sort-btn.active {
+    border-color: var(--red-dim);
+    color: var(--text);
+  }
+
+  /* Search button */
+  .search-btn {
+    padding: 0.6rem 2.5rem;
+    background: var(--red);
+    color: #fff;
+    border: none;
+    border-radius: 2px;
+    cursor: pointer;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: 2px;
+    transition: background 0.15s;
+    align-self: flex-start;
+  }
+
+  .search-btn:hover { background: #ff0a16; }
+  .search-btn:disabled { background: var(--red-dim); cursor: not-allowed; opacity: 0.6; }
+
+  /* Status */
+  .status {
+    padding: 0 3rem;
+    font-size: 0.8rem;
+    color: var(--muted);
+    min-height: 1.2rem;
+  }
+
+  .status.error { color: var(--tomato); }
+
+  /* Results */
+  .results-wrap {
+    padding: 1rem 3rem 4rem;
+    overflow-x: auto;
+  }
+
+  .results-count {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--muted);
+    margin-bottom: 1rem;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+    white-space: nowrap;
+  }
+
+  thead tr {
+    border-bottom: 1px solid var(--red-dim);
+  }
+
+  th {
+    padding: 0.6rem 1rem 0.6rem 0;
+    text-align: left;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 0.85rem;
+    letter-spacing: 2px;
+    color: var(--muted);
+    cursor: pointer;
+    user-select: none;
+  }
+
+  th:hover { color: var(--text); }
+  th.sort-active { color: var(--red); }
+
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.1s;
+  }
+
+  tbody tr:hover { background: var(--card); }
+
+  td {
+    padding: 0.55rem 1rem 0.55rem 0;
+    color: var(--text);
+    max-width: 260px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  td.genre-cell {
+    color: var(--muted);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  td.year-cell { color: var(--muted); }
+
+  td.imdb-cell {
+    color: var(--gold);
+    font-weight: 500;
+  }
+
+  td.rt-cell { font-weight: 500; }
+
+  .rt-fresh  { color: #66cc00; }
+  .rt-rotten { color: var(--tomato); }
+  .rt-na     { color: var(--muted); }
+
+  /* Spinner */
+  .spinner {
+    display: inline-block;
+    width: 14px; height: 14px;
+    border: 2px solid var(--border);
+    border-top-color: var(--red);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    vertical-align: middle;
+    margin-right: 0.4rem;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Proxy config notice */
+  .proxy-notice {
+    margin: 0 3rem 1rem;
+    padding: 0.8rem 1.2rem;
+    background: #1a1000;
+    border: 1px solid #3a2800;
+    border-radius: 2px;
+    font-size: 0.8rem;
+    color: #c8a040;
+    display: none;
+  }
+  .proxy-notice.show { display: block; }
+  .proxy-notice input {
+    margin-top: 0.5rem;
+    width: 100%;
+    padding: 0.4rem 0.6rem;
+    background: #0a0a0a;
+    border: 1px solid #3a2800;
+    color: var(--text);
+    font-family: monospace;
+    font-size: 0.8rem;
+    border-radius: 2px;
+  }
+  .proxy-notice button {
+    margin-top: 0.4rem;
+    padding: 0.3rem 1rem;
+    background: #c8a040;
+    color: #000;
+    border: none;
+    border-radius: 2px;
+    cursor: pointer;
+    font-size: 0.75rem;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Netflix Browse</h1>
+  <p>Find what's streaming · Powered by JustWatch</p>
+</header>
+
+<div class="proxy-notice" id="proxyNotice">
+  ⚠️ No proxy URL configured. Enter your Cloudflare Worker URL to enable live data:
+  <input type="text" id="proxyInput" placeholder="https://netflix-browse.YOUR-NAME.workers.dev">
+  <button onclick="saveProxy()">Save & Continue</button>
+</div>
+
+<div class="controls">
+
+  <div>
+    <div class="section-label">Genres</div>
+    <div class="genre-grid" id="genreGrid">
+      <div style="color:var(--muted);font-size:0.8rem;">Loading genres…</div>
+    </div>
+  </div>
+
+  <div>
+    <div class="section-label">Filter Mode</div>
+    <div class="mode-row">
+      <div class="toggle-wrap">
+        <button class="toggle-btn active" id="modeOR"  onclick="setMode('OR')">OR</button>
+        <button class="toggle-btn"        id="modeAND" onclick="setMode('AND')">AND</button>
+      </div>
+      <span class="mode-hint" id="modeHint">Any selected genre</span>
+    </div>
+  </div>
+
+  <div>
+    <div class="section-label">Sort Order <span style="color:var(--muted);font-weight:300;font-size:0.65rem">(click to add, click again to remove)</span></div>
+    <div class="sort-row" id="sortRow">
+      <button class="sort-btn" data-key="year"  onclick="toggleSort('year')" >Year</button>
+      <button class="sort-btn" data-key="imdb"  onclick="toggleSort('imdb')" >IMDB</button>
+      <button class="sort-btn" data-key="rt"    onclick="toggleSort('rt')"   >RT%</button>
+    </div>
+  </div>
+
+  <button class="search-btn" id="searchBtn" onclick="runSearch()">Browse</button>
+
+</div>
+
+<div class="status" id="status"></div>
+
+<div class="results-wrap" id="resultsWrap" style="display:none">
+  <div class="results-count" id="resultsCount"></div>
+  <table id="resultsTable">
+    <thead>
+      <tr>
+        <th onclick="tableSort('genre')">Genre</th>
+        <th onclick="tableSort('title')">Title</th>
+        <th onclick="tableSort('year')" >Year</th>
+        <th onclick="tableSort('imdb')" >IMDB</th>
+        <th onclick="tableSort('rt')"   >RT%</th>
+        <th onclick="tableSort('director')">Director</th>
+        <th onclick="tableSort('lead1')">Lead 1</th>
+        <th onclick="tableSort('lead2')">Lead 2</th>
+        <th onclick="tableSort('lead3')">Lead 3</th>
+      </tr>
+    </thead>
+    <tbody id="resultsBody"></tbody>
+  </table>
+</div>
+
+<script>
+// ── Config ────────────────────────────────────────────────────────────────────
+// IMPORTANT: Replace this with your Cloudflare Worker URL after deploying worker.js
+// e.g. 'https://netflix-browse.joe.workers.dev'
+let PROXY = localStorage.getItem('nfx_proxy') || '';
+
+if (!PROXY) {
+  document.getElementById('proxyNotice').classList.add('show');
+}
+
+function saveProxy() {
+  PROXY = document.getElementById('proxyInput').value.trim().replace(/\/$/, '');
+  localStorage.setItem('nfx_proxy', PROXY);
+  document.getElementById('proxyNotice').classList.remove('show');
+  loadGenres();
+}
+
+// ── State ─────────────────────────────────────────────────────────────────────
+let genres       = [];
+let selected     = new Set();
+let mode         = 'OR';   // OR | AND
+let sortOrder    = [];     // ordered list of active sort keys e.g. ['year','imdb']
+let tableRows    = [];
+let tableSortKey = null;
+let tableSortDir = 1;
+
+// ── GraphQL ───────────────────────────────────────────────────────────────────
+async function gql(query, variables = {}) {
+  const r = await fetch(PROXY, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query, variables }),
+  });
+  return r.json();
+}
+
+// ── Load genres ───────────────────────────────────────────────────────────────
+async function loadGenres() {
+  if (!PROXY) return;
+  const data = await gql(
+    'query { genres { shortName translation(language: en) } }'
+  );
+  genres = (data.data.genres || []).sort((a, b) =>
+    a.translation.localeCompare(b.translation)
+  );
+  renderGenreGrid();
+}
+
+function renderGenreGrid() {
+  const grid = document.getElementById('genreGrid');
+  grid.innerHTML = '';
+  genres.forEach(g => {
+    const btn = document.createElement('button');
+    btn.className = 'genre-btn' + (selected.has(g.shortName) ? ' selected' : '');
+    btn.textContent = g.translation;
+    btn.onclick = () => toggleGenre(g.shortName, btn);
+    grid.appendChild(btn);
+  });
+}
+
+function toggleGenre(shortName, btn) {
+  if (selected.has(shortName)) {
+    selected.delete(shortName);
+    btn.classList.remove('selected');
+  } else {
+    selected.add(shortName);
+    btn.classList.add('selected');
+  }
+}
+
+// ── Mode ──────────────────────────────────────────────────────────────────────
+function setMode(m) {
+  mode = m;
+  document.getElementById('modeOR').classList.toggle('active', m === 'OR');
+  document.getElementById('modeAND').classList.toggle('active', m === 'AND');
+  document.getElementById('modeHint').textContent =
+    m === 'OR' ? 'Any selected genre' : 'Must match ALL selected genres';
+}
+
+// ── Sort order ────────────────────────────────────────────────────────────────
+const SORT_DIR = { year: 1, imdb: -1, rt: -1 }; // 1=asc, -1=desc
+
+function toggleSort(key) {
+  const idx = sortOrder.indexOf(key);
+  if (idx === -1) {
+    sortOrder.push(key);
+  } else {
+    sortOrder.splice(idx, 1);
+  }
+  renderSortButtons();
+}
+
+function renderSortButtons() {
+  document.querySelectorAll('.sort-btn').forEach(btn => {
+    const key = btn.dataset.key;
+    const rank = sortOrder.indexOf(key);
+    btn.classList.toggle('active', rank !== -1);
+    const existing = btn.querySelector('.sort-rank');
+    if (existing) existing.remove();
+    if (rank !== -1 && sortOrder.length > 1) {
+      const badge = document.createElement('span');
+      badge.className = 'sort-rank';
+      badge.textContent = rank + 1;
+      btn.prepend(badge);
+    }
+  });
+}
+
+// ── Fetch movies ──────────────────────────────────────────────────────────────
+const MOVIE_QUERY = `
+query GetPopularTitles($country: Country!, $language: Language!, $first: Int!, $filter: TitleFilter) {
+  popularTitles(country: $country, first: $first, filter: $filter) {
+    edges {
+      node {
+        content(country: $country, language: $language) {
+          title
+          originalReleaseYear
+          credits { role name }
+          scoring { imdbScore tomatoMeter }
+        }
+      }
+    }
+  }
+}`;
+
+async function fetchMovies(genreList) {
+  const data = await gql(MOVIE_QUERY, {
+    country: 'US', language: 'en', first: 100,
+    filter: { objectTypes: ['MOVIE'], packages: ['nfx'], genres: genreList }
+  });
+  const label = genreList.map(s => genres.find(g => g.shortName === s)?.translation || s).join('/');
+  const results = {};
+  for (const edge of data.data.popularTitles.edges) {
+    const c = edge.node.content;
+    const credits = c.credits || [];
+    const directors = credits.filter(x => x.role === 'DIRECTOR').map(x => x.name);
+    const actors    = credits.filter(x => x.role === 'ACTOR').map(x => x.name).slice(0, 3);
+    const imdb = c.scoring?.imdbScore ?? null;
+    const rt   = c.scoring?.tomatoMeter ?? null;
+    results[c.title] = {
+      genre:    label,
+      title:    c.title,
+      year:     c.originalReleaseYear ?? null,
+      imdb,
+      rt,
+      director: directors[0] || '',
+      lead1:    actors[0] || '',
+      lead2:    actors[1] || '',
+      lead3:    actors[2] || '',
+    };
+  }
+  return results;
+}
+
+// ── Run search ────────────────────────────────────────────────────────────────
+async function runSearch() {
+  if (!PROXY) {
+    setStatus('Please configure your Cloudflare Worker URL first.', true);
+    document.getElementById('proxyNotice').classList.add('show');
+    return;
+  }
+  if (selected.size === 0) {
+    setStatus('Please select at least one genre.', true);
+    return;
+  }
+
+  const btn = document.getElementById('searchBtn');
+  btn.disabled = true;
+  setStatus('<span class="spinner"></span> Fetching…');
+  document.getElementById('resultsWrap').style.display = 'none';
+
+  try {
+    const genreList = [...selected];
+    let rows;
+
+    if (mode === 'OR') {
+      const movies = await fetchMovies(genreList);
+      rows = Object.values(movies);
+    } else {
+      // AND: fetch each genre separately, intersect
+      const sets = [];
+      for (const g of genreList) {
+        setStatus(`<span class="spinner"></span> Fetching ${genres.find(x => x.shortName === g)?.translation}…`);
+        const movies = await fetchMovies([g]);
+        sets.push(movies);
+      }
+      const common = Object.keys(sets[0]).filter(t => sets.every(s => t in s));
+      rows = common.map(t => {
+        const row = { ...sets[0][t] };
+        row.genre = sets.map((s, i) => {
+          const g = genres.find(x => x.shortName === genreList[i]);
+          return g?.translation || genreList[i];
+        }).join(' & ');
+        return row;
+      });
+    }
+
+    tableRows = rows;
+    applySort();
+    renderTable();
+    setStatus('');
+
+  } catch (e) {
+    setStatus('Error fetching data. Check your Worker URL.', true);
+    console.error(e);
+  }
+
+  btn.disabled = false;
+}
+
+// ── Sorting ───────────────────────────────────────────────────────────────────
+function applySort() {
+  const keys = sortOrder.length ? sortOrder : ['rt'];
+  // stable multi-key: apply in reverse order
+  [...keys].reverse().forEach(key => {
+    const dir = SORT_DIR[key];
+    tableRows.sort((a, b) => {
+      const av = a[key] ?? (dir === 1 ? Infinity : -Infinity);
+      const bv = b[key] ?? (dir === 1 ? Infinity : -Infinity);
+      return av < bv ? dir : av > bv ? -dir : 0;
+    });
+  });
+}
+
+function tableSort(key) {
+  if (tableSortKey === key) {
+    tableSortDir *= -1;
+  } else {
+    tableSortKey = key;
+    tableSortDir = ['year', 'title', 'genre', 'director', 'lead1', 'lead2', 'lead3'].includes(key) ? 1 : -1;
+  }
+  tableRows.sort((a, b) => {
+    const av = a[key] ?? '';
+    const bv = b[key] ?? '';
+    return av < bv ? tableSortDir : av > bv ? -tableSortDir : 0;
+  });
+  document.querySelectorAll('th').forEach(th => th.classList.remove('sort-active'));
+  event.target.classList.add('sort-active');
+  renderTableBody();
+}
+
+// ── Render ────────────────────────────────────────────────────────────────────
+function renderTable() {
+  document.getElementById('resultsCount').textContent =
+    `${tableRows.length} movie${tableRows.length !== 1 ? 's' : ''} found`;
+  document.getElementById('resultsWrap').style.display = 'block';
+  renderTableBody();
+}
+
+function renderTableBody() {
+  const tbody = document.getElementById('resultsBody');
+  tbody.innerHTML = '';
+  tableRows.forEach(r => {
+    const tr = document.createElement('tr');
+
+    const rtClass = r.rt === null ? 'rt-na' : r.rt >= 60 ? 'rt-fresh' : 'rt-rotten';
+
+    tr.innerHTML = `
+      <td class="genre-cell">${esc(r.genre)}</td>
+      <td>${esc(r.title)}</td>
+      <td class="year-cell">${r.year ?? '—'}</td>
+      <td class="imdb-cell">${r.imdb !== null ? r.imdb.toFixed(1) : '—'}</td>
+      <td class="rt-cell ${rtClass}">${r.rt !== null ? r.rt + '%' : '—'}</td>
+      <td>${esc(r.director)}</td>
+      <td>${esc(r.lead1)}</td>
+      <td>${esc(r.lead2)}</td>
+      <td>${esc(r.lead3)}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function esc(s) {
+  return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function setStatus(msg, isError = false) {
+  const el = document.getElementById('status');
+  el.innerHTML = msg;
+  el.className = 'status' + (isError ? ' error' : '');
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+loadGenres();
+</script>
+</body>
+</html>
