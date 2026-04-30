@@ -207,6 +207,17 @@
 </div>
 
 <div class="section-label">Genres</div>
+<p style="font-family:Helvetica,Arial,sans-serif;font-size:0.85rem;color:#555;margin-bottom:12px;">
+  Browse by JustWatch genre below, or go directly to a
+  <a href="https://www.whats-on-netflix.com/news/the-netflix-id-bible-every-category-on-netflix/" target="_blank" style="color:#2a6db5;">Netflix sub-genre code</a>:
+  <span style="white-space:nowrap;">
+    netflix.com/browse/genre/
+    <input id="genreCode" type="text" placeholder="100041"
+      style="width:90px;padding:2px 6px;border:1px solid #e0e0e0;border-radius:4px;font-family:monospace;font-size:0.85rem;vertical-align:middle;">
+    <button onclick="openNetflixGenre()"
+      style="padding:2px 10px;background:#2a6db5;color:#fff;border:none;border-radius:4px;cursor:pointer;font-family:Helvetica,Arial,sans-serif;font-size:0.82rem;font-weight:bold;vertical-align:middle;">Go</button>
+  </span>
+</p>
 <div class="genre-grid" id="genreGrid">
   <span style="color:#888;font-family:Helvetica,sans-serif;font-size:0.85rem">Loading genres…</span>
 </div>
@@ -262,7 +273,18 @@ function saveProxy() {
   PROXY = document.getElementById('proxyInput').value.trim().replace(/\/$/, '');
   localStorage.setItem('nfx_proxy', PROXY);
   document.getElementById('proxyNotice').classList.remove('show');
-  loadGenres();
+  function openNetflixGenre() {
+  const code = document.getElementById('genreCode').value.trim();
+  window.open('https://www.netflix.com/browse/genre/' + code, '_blank');
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && document.activeElement.id === 'genreCode') {
+    openNetflixGenre();
+  }
+});
+
+loadGenres();
 }
 
 let genres = [], selected = new Set(), mode = 'OR';
@@ -457,6 +479,17 @@ function setStatus(msg, isError=false) {
   el.innerHTML = msg;
   el.className = 'status' + (isError ? ' error' : '');
 }
+
+function openNetflixGenre() {
+  const code = document.getElementById('genreCode').value.trim();
+  window.open('https://www.netflix.com/browse/genre/' + code, '_blank');
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && document.activeElement.id === 'genreCode') {
+    openNetflixGenre();
+  }
+});
 
 loadGenres();
 </script>
