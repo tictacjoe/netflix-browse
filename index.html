@@ -403,7 +403,7 @@
 // ── Config ────────────────────────────────────────────────────────────────────
 // IMPORTANT: Replace this with your Cloudflare Worker URL after deploying worker.js
 // e.g. 'https://netflix-browse.joe.workers.dev'
-let PROXY = localStorage.getItem('nfx_proxy') || '';
+let PROXY = localStorage.getItem('nfx_proxy') || 'https://netflix-browse.tictacjoe.workers.dev';
 
 if (!PROXY) {
   document.getElementById('proxyNotice').classList.add('show');
