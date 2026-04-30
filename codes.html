@@ -237,7 +237,7 @@ function toggleEditMode() {
 }
 
 function resetCodes() {
-  if (!confirm('Restore all ' + hidden.size + ' hidden entries?')) return;
+  if (!confirm('Restore all ' + hidden.size + ' hidden entries? Renames will be kept.')) return;
   hidden.clear();
   save();
   filterCodes();
