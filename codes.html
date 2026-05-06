@@ -4,183 +4,247 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Netflix Sub-genre Codes — tictacjoe</title>
+<link rel="stylesheet" type="text/css" href="https://tictacjoe.github.io/css/main.css">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    background: #fafafa; color: #222;
-    font-family: 'Georgia', serif; font-size: 17px; line-height: 1.6;
-    padding: 40px 20px 80px; max-width: 1300px; margin: 0 auto;
-  }
-  nav {
-    margin-bottom: 48px; border-bottom: 1px solid #e0e0e0;
-    padding-bottom: 12px; text-align: center;
-  }
-  nav a {
-    font-family: 'Helvetica','Arial',sans-serif; font-size: 0.9em;
-    font-weight: bold; letter-spacing: 0.03em; text-transform: uppercase;
-    color: #2a6db5; text-decoration: none; margin: 0 12px;
-  }
-  nav a:hover { text-decoration: underline; color: #1a4d8a; }
-  header { margin-bottom: 36px; }
-  header h1 {
-    font-family: 'Helvetica','Arial',sans-serif;
-    font-size: 2.2em; font-weight: 700; color: #111; margin-bottom: 4px;
-  }
-  header p {
-    font-family: 'Helvetica','Arial',sans-serif;
-    font-size: 0.85em; color: #888;
-  }
-  .section-label {
-    font-family: 'Helvetica','Arial',sans-serif; font-size: 1.1em;
-    font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
-    color: #555; margin-top: 32px; margin-bottom: 10px;
-    border-bottom: 1px solid #e8e8e8; padding-bottom: 4px;
-  }
+  body { max-width: 1200px; }
 
   /* ── Controls ── */
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    margin-bottom: 24px;
+    font-family: 'Helvetica', 'Arial', sans-serif;
+    font-size: 0.92em;
+  }
+  .control-group { min-width: 180px; }
+  .control-group h3 {
+    font-size: 0.8em;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #555;
+    margin: 0 0 8px;
+    border-bottom: 1px solid #e8e8e8;
+    padding-bottom: 4px;
+  }
+
   .controls-row {
-    display: flex; gap: 0.5rem; align-items: center;
-    flex-wrap: wrap; margin-bottom: 8px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 4px;
   }
   #codeSearch {
-    padding: 0.35rem 0.8rem; border: 1px solid #e0e0e0; border-radius: 4px;
-    font-family: 'Helvetica','Arial',sans-serif; font-size: 0.85rem; width: 280px;
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1em;
+    width: 280px;
+    font-family: 'Helvetica', 'Arial', sans-serif;
   }
   .btn-sm {
-    padding: 0.3rem 0.9rem; border: 1px solid #e0e0e0; background: #fff; color: #555;
-    border-radius: 4px; cursor: pointer;
-    font-family: 'Helvetica','Arial',sans-serif; font-size: 0.78rem; transition: all 0.12s;
+    padding: 4px 12px;
+    border: 1px solid #e0e0e0;
+    background: #fff;
+    color: #555;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: 'Helvetica', 'Arial', sans-serif;
+    font-size: 0.82rem;
+    transition: all 0.12s;
   }
   .btn-sm:hover { border-color: #2a6db5; color: #2a6db5; }
-  .btn-sm.active { background: #f5c518; border-color: #d4a800; color: #000; font-weight: bold; }
-  .btn-sm.danger { border-color: #e0e0e0; }
+  .btn-sm.active { border-color: #2a6db5; color: #2a6db5; font-weight: bold; background: #e8f0ff; }
   .btn-sm.danger:hover { border-color: #c0392b; color: #c0392b; }
 
   .edit-hint {
-    font-family: 'Helvetica','Arial',sans-serif; font-size: 0.8rem; color: #888;
-    margin-bottom: 8px; display: none;
+    font-family: 'Helvetica', 'Arial', sans-serif;
+    font-size: 0.78em;
+    color: #999;
+    margin-top: 4px;
+    display: none;
   }
   body.edit-mode .edit-hint { display: block; }
 
   .codes-meta {
-    font-family: 'Helvetica','Arial',sans-serif; font-size: 0.75rem;
-    color: #aaa; margin-bottom: 6px;
+    font-family: 'Helvetica', 'Arial', sans-serif;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #888;
+    margin-bottom: 8px;
+    margin-top: 12px;
   }
 
   /* ── Codes grid ── */
   .codes-grid {
-    display: flex; flex-wrap: wrap; gap: 0.35rem;
-    max-height: 55vh; overflow-y: auto;
-    border: 1px solid #e8e8e8; border-radius: 4px;
-    padding: 12px; background: #fff; margin-bottom: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    max-height: 55vh;
+    overflow-y: auto;
+    border: 1px solid #e8e8e8;
+    border-radius: 4px;
+    padding: 12px;
+    background: #fff;
+    margin-bottom: 24px;
   }
   .code-btn {
-    display: inline-flex; align-items: center; gap: 4px;
-    padding: 0.22rem 0.75rem; border: 1px solid #e0e0e0;
-    background: #fafafa; color: #333; border-radius: 4px; cursor: pointer;
-    font-family: 'Helvetica','Arial',sans-serif; font-size: 0.8rem;
-    transition: all 0.1s; white-space: nowrap; user-select: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border: 1px solid #ccc;
+    background: #f8f8f8;
+    color: #444;
+    border-radius: 12px;
+    cursor: pointer;
+    font-family: 'Helvetica', 'Arial', sans-serif;
+    font-size: 0.82em;
+    transition: background 0.1s, border-color 0.1s;
+    white-space: nowrap;
+    user-select: none;
   }
-  .code-btn:hover { border-color: #2a6db5; color: #2a6db5; background: #f0f5fb; }
-  .code-num { color: #bbb; font-size: 0.68rem; font-family: monospace; }
+  .code-btn:hover { background: #e8f0ff; border-color: #2a6db5; color: #2a6db5; }
+  .code-num { color: #aaa; font-size: 0.85em; font-family: monospace; }
   .edit-x {
-    display: none; color: #c0392b; font-weight: bold;
-    font-size: 0.82rem; line-height: 1; margin-left: 2px;
-    cursor: pointer; padding: 0 2px;
+    display: none;
+    color: #c0392b;
+    font-weight: bold;
+    font-size: 0.9em;
+    margin-left: 2px;
+    cursor: pointer;
   }
   body.edit-mode .code-btn .edit-x { display: inline; }
 
   /* ── Manual entry ── */
   .manual-section {
-    background: #fff; border: 1px solid #e8e8e8; border-radius: 4px;
-    padding: 20px 24px; margin-top: 8px;
+    background: #fff;
+    border: 1px solid #e8e8e8;
+    border-radius: 4px;
+    padding: 20px 24px;
+    margin-top: 8px;
   }
   .manual-section h2 {
-    font-family: 'Helvetica','Arial',sans-serif; font-size: 1em;
-    font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
-    color: #555; margin-bottom: 12px; border-bottom: 1px solid #e8e8e8; padding-bottom: 4px;
+    font-family: 'Helvetica', 'Arial', sans-serif;
+    font-size: 0.8em;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #555;
+    margin-bottom: 12px;
+    border-bottom: 1px solid #e8e8e8;
+    padding-bottom: 4px;
   }
   .url-row {
-    display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;
-    font-family: 'Helvetica','Arial',sans-serif; font-size: 0.88rem; color: #555;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    font-family: 'Helvetica', 'Arial', sans-serif;
+    font-size: 0.92em;
+    color: #333;
     margin-bottom: 10px;
   }
   .url-prefix {
-    font-family: monospace; font-size: 0.85rem; color: #888;
-    background: #f5f5f5; padding: 0.3rem 0.6rem; border-radius: 4px;
+    font-family: monospace;
+    font-size: 0.9em;
+    color: #888;
+    background: #f5f5f5;
+    padding: 4px 8px;
+    border-radius: 4px;
   }
   .url-row input {
-    width: 130px; padding: 0.32rem 0.6rem;
-    border: 1px solid #e0e0e0; border-radius: 4px;
-    font-family: monospace; font-size: 0.88rem;
+    width: 130px;
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 1em;
   }
   .url-row button {
-    padding: 0.32rem 1.1rem; background: #2a6db5; color: #fff;
-    border: none; border-radius: 4px; cursor: pointer;
-    font-family: 'Helvetica','Arial',sans-serif; font-size: 0.85rem; font-weight: bold;
+    padding: 8px 20px;
+    background: #2a6db5;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: 'Helvetica', 'Arial', sans-serif;
+    font-size: 0.9em;
+    font-weight: bold;
   }
   .url-row button:hover { background: #1a4d8a; }
   .manual-note {
-    font-family: 'Helvetica','Arial',sans-serif; font-size: 0.8rem; color: #888;
+    font-family: 'Helvetica', 'Arial', sans-serif;
+    font-size: 0.82em;
+    color: #888;
   }
   .manual-note a { color: #2a6db5; }
 
-  footer {
-    margin-top: 60px; border-top: 1px solid #e0e0e0; padding-top: 16px;
-    font-size: 0.85em; color: #888; font-family: 'Helvetica','Arial',sans-serif; text-align: center;
+  @media (max-width: 600px) {
+    .controls { flex-direction: column; }
+    .url-row { flex-direction: column; align-items: flex-start; }
+    .url-row input { width: 100%; }
   }
-  footer a { color: #888; text-decoration: none; }
-  footer a:hover { color: #333; }
 </style>
 </head>
 <body>
 
 <nav>
-  <a href="https://tictacjoe.github.io/">Home</a>
-  <a href="https://tictacjoe.github.io/blog">Blog</a>
-  <a href="https://github.com/tictacjoe">GitHub</a>
-  <a href="index.html">← Netflix Browse</a>
+  <ul>
+    <li><a href="https://tictacjoe.github.io/">Home</a></li>
+    <li><a href="https://github.com/tictacjoe">GitHub</a></li>
+    <li><a href="index.html">← Netflix Browse</a></li>
+  </ul>
 </nav>
 
-<header style="text-align:center;">
+<div class="container">
   <a href="https://tictacjoe.github.io/">
     <img src="https://tictacjoe.github.io/pics/weblake.png"
          alt="Lake view"
-         style="display:block;width:100%;max-width:480px;height:100px;object-fit:cover;object-position:center;border-radius:6px;margin:0 auto 16px;opacity:0.85;">
+         class="hero-image">
   </a>
-  <h1 style="text-align:left;">Netflix Sub-genre Codes</h1>
-  <p style="text-align:left;">Click any genre to open it directly on Netflix · 1860 codes</p>
-</header>
 
-<div class="section-label">Browse Genres</div>
-
-<div class="controls-row">
-  <input id="codeSearch" type="text" placeholder="Search genres…" oninput="filterCodes()">
-  <button class="btn-sm" id="editToggle" onclick="toggleEditMode()">✏️ Edit</button>
-  <button class="btn-sm danger" onclick="resetCodes()">Reset hidden</button>
-</div>
-
-<div class="edit-hint">Edit mode: click ✕ to hide entries that don't work. Changes saved automatically.</div>
-<div class="codes-meta" id="codesMeta"></div>
-<div class="codes-grid" id="codesGrid"></div>
-
-<div class="manual-section">
-  <h2>Enter a Code Manually</h2>
-  <div class="url-row">
-    <span class="url-prefix">netflix.com/browse/genre/</span>
-    <input id="manualCode" type="text" placeholder="100041"
-      onkeydown="if(event.key==='Enter') openCode()">
-    <button onclick="openCode()">Open on Netflix</button>
-  </div>
-  <p class="manual-note">
-    Need more codes?
-    <a href="https://www.whats-on-netflix.com/news/the-netflix-id-bible-every-category-on-netflix/" target="_blank">Full Netflix code bible ↗</a>
+  <h1>Netflix Sub-genre Codes</h1>
+  <p style="text-align:center; font-size: 0.92em; margin-bottom: 24px; color: #555;">
+    Click any genre to open it directly on Netflix · 1860 codes
   </p>
+
+  <div class="controls">
+    <div class="control-group" style="flex: 1; min-width: 300px;">
+      <h3>Search Genres</h3>
+      <div class="controls-row">
+        <input id="codeSearch" type="text" placeholder="Search genres…" oninput="filterCodes()">
+        <button class="btn-sm" id="editToggle" onclick="toggleEditMode()">✏️ Edit</button>
+        <button class="btn-sm danger" onclick="resetCodes()">Reset hidden</button>
+      </div>
+      <div class="edit-hint">Click ✕ to hide entries that don't work. Changes saved automatically.</div>
+    </div>
+  </div>
+
+  <div class="codes-meta" id="codesMeta"></div>
+  <div class="codes-grid" id="codesGrid"></div>
+
+  <div class="manual-section">
+    <h2>Enter a Code Manually</h2>
+    <div class="url-row">
+      <span class="url-prefix">netflix.com/browse/genre/</span>
+      <input id="manualCode" type="text" placeholder="100041"
+        onkeydown="if(event.key==='Enter') openCode()">
+      <button onclick="openCode()">Open on Netflix</button>
+    </div>
+    <p class="manual-note">
+      Need more codes?
+      <a href="https://www.whats-on-netflix.com/news/the-netflix-id-bible-every-category-on-netflix/" target="_blank">Full Netflix code bible ↗</a>
+    </p>
+  </div>
 </div>
 
 <footer>
-  <a href="https://tictacjoe.github.io/">tictacjoe.github.io</a> &nbsp;·&nbsp;
-  <a href="mailto:tictacjoe@gmail.com">tictacjoe@gmail.com</a>
+  <ul>
+    <li><a href="mailto:tictacjoe@gmail.com">email</a></li>
+    <li><a href="https://github.com/tictacjoe">github.com/tictacjoe</a></li>
+  </ul>
 </footer>
 
 <script>
